@@ -24,9 +24,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
-import android.support.v4.os.EnvironmentCompat;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.FileProvider;
+import androidx.core.os.EnvironmentCompat;
 
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
@@ -105,6 +105,7 @@ public class MediaStoreCompat {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp =
@@ -114,8 +115,13 @@ public class MediaStoreCompat {
         if (mCaptureStrategy.isPublic) {
             storageDir = Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_PICTURES);
+            if (!storageDir.exists()) storageDir.mkdirs();
         } else {
             storageDir = mContext.get().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        }
+        if (mCaptureStrategy.directory != null) {
+            storageDir = new File(storageDir, mCaptureStrategy.directory);
+            if (!storageDir.exists()) storageDir.mkdirs();
         }
 
         // Avoid joining path components manually
